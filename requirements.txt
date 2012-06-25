@@ -1,0 +1,3 @@
+Impacket==0.9.6.0
+javaobj==0.1.0
+pcapy==0.10.5
