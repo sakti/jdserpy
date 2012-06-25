@@ -6,10 +6,10 @@ from impacket.ImpactDecoder import EthDecoder
 import socket
 import javaobj
 import re
+import optparse
 
 all_chars = (unichr(i) for i in xrange(0x110000))
 control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
-
 control_char_re = re.compile('[%s]' % re.escape(control_chars))
 
 
@@ -17,6 +17,8 @@ def remove_control_chars(s):
     return control_char_re.sub(' ', s)
 
 decoder = EthDecoder()
+
+MAGIC_NUMBER = '\xac\xed'
 
 
 def packet_handler(hdr, data):
@@ -39,7 +41,7 @@ def packet_handler(hdr, data):
     # java serialization detection
     packet_data = tmp.child().child().child()
     packet_data_str = packet_data.get_packet()
-    index = packet_data_str.find('\xac\xed')
+    index = packet_data_str.find(MAGIC_NUMBER)
     if index != -1:
         print '\n\n'
         print '=' * 80
@@ -61,23 +63,25 @@ def packet_handler(hdr, data):
             print e
 
 
-def main(fileinputname, live=False):
+def main(input_res, live=False):
     if live:
-        handler = pcapy.open_live('wlan0', 1500, 0, 100)
+        handler = pcapy.open_live(input_res, 1500, 0, 100)
     else:
-        handler = pcapy.open_offline(fileinputname)
+        handler = pcapy.open_offline(input_res)
     handler.loop(0, packet_handler)
 
 
-def help():
-    print '%s <pcap filename>' % __file__
-
-
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        help()
-        sys.exit(1)
-    livecapture = False
-    if sys.argv[1] == 'live':
-        livecapture = True
-    main(sys.argv[1], livecapture)
+    parser = optparse.OptionParser()
+    parser.add_option('-i', '--input', action='store', dest='input_res',
+            type='string')
+    parser.add_option('--live', action='store_true', dest='is_live',
+            default=False)
+
+    options, remainder = parser.parse_args(sys.argv)
+
+    if not options.input_res:
+        parser.print_help()
+        sys.exit(2)
+
+    main(options.input_res, options.is_live)
