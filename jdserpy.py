@@ -8,6 +8,7 @@ import javaobj
 import re
 import optparse
 from pprint import pprint
+import colorama
 from colorama import Fore
 
 all_chars = (unichr(i) for i in xrange(0x110000))
@@ -82,6 +83,9 @@ def main(input_res, live=False):
 
 
 if __name__ == '__main__':
+    # for OS independent
+    colorama.init()
+
     parser = optparse.OptionParser()
     parser.add_option('-i', '--input', action='store', dest='input_res',
             type='string')

@@ -10,6 +10,7 @@ Requirements
 - pcapy
 - Impacket
 - javaobj
+- colorama
 
 
 Usage
