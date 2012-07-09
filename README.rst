@@ -36,3 +36,8 @@ or live capture
 ::
 
     # ./jdserpy.py -i eth0 --live
+
+Next Milestones
+---------------
+- Analyze fullstream tcp not just one packet
+- Output colorization
