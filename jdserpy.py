@@ -8,6 +8,7 @@ import javaobj
 import re
 import optparse
 from pprint import pprint
+from colorama import Fore
 
 all_chars = (unichr(i) for i in xrange(0x110000))
 control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
@@ -35,9 +36,11 @@ def packet_handler(hdr, data):
     if proto == socket.IPPROTO_TCP:
         dport = tmp.child().child().get_th_dport()
         sport = tmp.child().child().get_th_sport()
+        proto_desc = 'TCP'
     elif proto == socket.IPPROTO_UDP:
         dport = tmp.child().child().get_uh_dport()
         sport = tmp.child().child().get_uh_sport()
+        proto_desc = 'UDP'
 
     # java serialization detection
     packet_data = tmp.child().child().child()
@@ -45,19 +48,25 @@ def packet_handler(hdr, data):
     index = packet_data_str.find(MAGIC_NUMBER)
     if index != -1:
         print '\n\n'
-        print '=' * 80
-        print ip_src, ip_dst, proto
-        print dport, sport
+        print Fore.CYAN + '=' * 80 + Fore.RESET
+        print Fore.GREEN + '%s:%s -> %s:%s [%s]' % (ip_src, sport, ip_dst,
+                dport, proto_desc) + Fore.RESET
         packet_data_str = packet_data_str[index:]
 
         try:
+            # parse java serialization to python object
             pobj = javaobj.loads(packet_data_str)
+
             if isinstance(pobj, str):
-                pprint(remove_control_chars(pobj).split())
+                print(remove_control_chars(pobj).split()[0][1:])
+                print Fore.CYAN + '-' * 80 + Fore.RESET
+                # print package body, cause fail parse.
+                print pprint(remove_control_chars(packet_data_str).split())
             else:
                 print pobj
-            print '-' * 80
-            print pprint(remove_control_chars(packet_data_str).split())
+
+            print Fore.CYAN + '=' * 80 + Fore.RESET
+
             # import pdb
             # pdb.set_trace()
         except Exception as e:
