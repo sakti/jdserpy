@@ -7,6 +7,7 @@ import socket
 import javaobj
 import re
 import optparse
+from pprint import pprint
 
 all_chars = (unichr(i) for i in xrange(0x110000))
 control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
@@ -52,11 +53,11 @@ def packet_handler(hdr, data):
         try:
             pobj = javaobj.loads(packet_data_str)
             if isinstance(pobj, str):
-                print remove_control_chars(pobj)
+                pprint(remove_control_chars(pobj).split())
             else:
                 print pobj
             print '-' * 80
-            print remove_control_chars(packet_data_str)
+            print pprint(remove_control_chars(packet_data_str).split())
             # import pdb
             # pdb.set_trace()
         except Exception as e:
