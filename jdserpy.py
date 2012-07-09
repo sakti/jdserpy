@@ -59,11 +59,13 @@ def packet_handler(hdr, data):
             pobj = javaobj.loads(packet_data_str)
 
             if isinstance(pobj, str):
-                print(remove_control_chars(pobj).split()[0][1:])
+                print(Fore.RED + remove_control_chars(pobj).split()[0][1:])
                 print Fore.CYAN + '-' * 80 + Fore.RESET
                 # print package body, cause fail parse.
-                print pprint(remove_control_chars(packet_data_str).split())
+                print Fore.YELLOW
+                pprint(remove_control_chars(packet_data_str).split())
             else:
+                print Fore.GREEN
                 print pobj
 
             print Fore.CYAN + '=' * 80 + Fore.RESET
